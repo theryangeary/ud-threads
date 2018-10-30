@@ -17,7 +17,7 @@ tcb* runningQueue;
 void t_yield()
 {
   tcb* current = readyQueue;
-  if (NULL == current) {
+  if (NULL == readyQueue) {
     runningQueue = readyQueue;
     return;
   }
@@ -29,12 +29,6 @@ void t_yield()
     runningQueue = readyQueue;
     readyQueue = readyQueue->next;
     runningQueue->next = NULL;
-
-    /* ucontext_t *tmp; */
-
-    /* tmp = running; */
-    /* running = ready; */
-    /* ready = tmp; */
 
     swapcontext(&readyQueue->thread_context, &runningQueue->thread_context);
   }
@@ -82,8 +76,8 @@ int t_create(void (*fct)(int), int id, int pri)
   tmp->thread_context = *uc;
 
   tcb* current = readyQueue;
-  if(NULL == current) {
-    current = tmp;
+  if(NULL == readyQueue) {
+    readyQueue = tmp;
   }
   else {
     while(NULL != current->next) {
@@ -105,9 +99,9 @@ void t_shutdown() {
 }
 
 void t_terminate() {
-  tcb* toRemove = runningQueue;
-  runningQueue = runningQueue->next;
-  free(toRemove);
+  if (runningQueue != NULL) {
+    free(runningQueue);
+  }
   runningQueue = readyQueue;
   readyQueue = readyQueue->next;
   runningQueue->next = NULL;
