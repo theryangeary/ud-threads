@@ -17,6 +17,8 @@ tcb* runningQueue;
 void t_yield()
 {
   tcb* current = readyQueue;
+
+  current = readyQueue;
   if (NULL == readyQueue) {
     runningQueue = readyQueue;
     return;
@@ -26,11 +28,13 @@ void t_yield()
       current = current->next;
     }
     current->next = runningQueue;
+    tcb* last = runningQueue;
     runningQueue = readyQueue;
     readyQueue = readyQueue->next;
     runningQueue->next = NULL;
+    current = readyQueue;
 
-    swapcontext(&readyQueue->thread_context, &runningQueue->thread_context);
+    swapcontext(&last->thread_context, &runningQueue->thread_context);
   }
 }
 

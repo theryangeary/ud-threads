@@ -37,5 +37,8 @@ test00: test00.o t_lib.a Makefile
 test01: test01.o t_lib.a Makefile
 	${CC} ${CFLAGS} test01.o t_lib.a -o test01
 	
+test01x: test01x.o t_lib.a Makefile
+	${CC} ${CFLAGS} test01x.o t_lib.a -o test01x
+	
 clean:
 	rm -f t_lib.a ${EXECS} ${LIBOBJS} ${TSTOBJS} 
