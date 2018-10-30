@@ -9,8 +9,6 @@ struct tcb {
 
 typedef struct tcb tcb;
 
-ucontext_t *running;
-ucontext_t *ready;
 tcb* readyQueue;
 tcb* runningQueue;
 
@@ -40,13 +38,11 @@ void t_yield()
 
 void t_init()
 {
-  readyQueue = (tcb*) malloc(sizeof(tcb));
   runningQueue = (tcb*) malloc(sizeof(tcb));
   ucontext_t *tmp;
   tmp = (ucontext_t *) malloc(sizeof(ucontext_t));
 
   getcontext(tmp);    /* let tmp be the context of main() */
-  running = tmp;
   runningQueue->thread_id = 0;
   runningQueue->thread_priority = 0;
   runningQueue->thread_context = *tmp;
@@ -62,17 +58,10 @@ int t_create(void (*fct)(int), int id, int pri)
   uc = (ucontext_t *) malloc(sizeof(ucontext_t));
 
   getcontext(uc);
-/***
-  uc->uc_stack.ss_sp = mmap(0, sz,
-       PROT_READ | PROT_WRITE | PROT_EXEC,
-       MAP_PRIVATE | MAP_ANON, -1, 0);
-***/
   uc->uc_stack.ss_sp = malloc(sz);  /* new statement */
   uc->uc_stack.ss_size = sz;
   uc->uc_stack.ss_flags = 0;
-  uc->uc_link = running;
   makecontext(uc, (void (*)(void)) fct, 1, id);
-  ready = uc;
 
   tcb* tmp = (tcb*) malloc(sizeof(tcb));
   tmp->thread_id = id;
@@ -93,17 +82,26 @@ int t_create(void (*fct)(int), int id, int pri)
 }
 
 void t_shutdown() {
-  tcb* current = runningQueue;
+  tcb* current = readyQueue;
   tcb* next = current;
   while(NULL != current) {
     next = current->next;
+    free(current->thread_context.uc_stack.ss_sp);
+    /* free(&current->thread_context); */
     free(current);
     current = next;
+  }
+  if (NULL != runningQueue) {
+    free(runningQueue->thread_context.uc_stack.ss_sp);
+    /* free(&runningQueue->thread_context); */
+    free(runningQueue);
   }
 }
 
 void t_terminate() {
   if (runningQueue != NULL) {
+    free(runningQueue->thread_context.uc_stack.ss_sp);
+    /* free(&(runningQueue->thread_context)); */
     free(runningQueue);
   }
   runningQueue = readyQueue;
