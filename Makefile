@@ -15,7 +15,7 @@ EXECS = test00
 
 LIBSRCS = t_lib.c
 
-TSTSRCS = test00.c
+TSTSRCS = test00.c test01.c
 
 # ar creates the static thread library
 
@@ -34,5 +34,8 @@ test00.o: test00.c ud_thread.h Makefile
 test00: test00.o t_lib.a Makefile
 	${CC} ${CFLAGS} test00.o t_lib.a -o test00
 
+test01: test01.o t_lib.a Makefile
+	${CC} ${CFLAGS} test01.o t_lib.a -o test01
+	
 clean:
 	rm -f t_lib.a ${EXECS} ${LIBOBJS} ${TSTOBJS} 
