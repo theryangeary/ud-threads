@@ -13,15 +13,31 @@ ucontext_t *running;
 ucontext_t *ready;
 tcb* readyQueue;
 tcb* runningQueue;
+
 void t_yield()
 {
-  ucontext_t *tmp;
+  tcb* current = readyQueue;
+  if (NULL == current) {
+    runningQueue = readyQueue;
+    return;
+  }
+  else {
+    while(NULL != current->next) {
+      current = current->next;
+    }
+    current->next = runningQueue;
+    runningQueue = readyQueue;
+    readyQueue = readyQueue->next;
+    runningQueue->next = NULL;
 
-  tmp = running;
-  running = ready;
-  ready = tmp;
+    /* ucontext_t *tmp; */
 
-  swapcontext(ready, running);
+    /* tmp = running; */
+    /* running = ready; */
+    /* ready = tmp; */
+
+    swapcontext(&readyQueue->thread_context, &runningQueue->thread_context);
+  }
 }
 
 void t_init()
@@ -56,9 +72,26 @@ int t_create(void (*fct)(int), int id, int pri)
   uc->uc_stack.ss_sp = malloc(sz);  /* new statement */
   uc->uc_stack.ss_size = sz;
   uc->uc_stack.ss_flags = 0;
-  uc->uc_link = running; 
+  uc->uc_link = running;
   makecontext(uc, (void (*)(void)) fct, 1, id);
   ready = uc;
+
+  tcb* tmp = (tcb*) malloc(sizeof(tcb));
+  tmp->thread_id = id;
+  tmp->thread_priority = pri;
+  tmp->thread_context = *uc;
+
+  tcb* current = readyQueue;
+  if(NULL == current) {
+    current = tmp;
+  }
+  else {
+    while(NULL != current->next) {
+      current = current->next;
+    }
+    current->next = tmp;
+  }
+  return 0;
 }
 
 void t_shutdown() {
@@ -70,3 +103,14 @@ void t_shutdown() {
     current = next;
   }
 }
+
+void t_terminate() {
+  tcb* toRemove = runningQueue;
+  runningQueue = runningQueue->next;
+  free(toRemove);
+  runningQueue = readyQueue;
+  readyQueue = readyQueue->next;
+  runningQueue->next = NULL;
+  setcontext(&runningQueue->thread_context);
+}
+
