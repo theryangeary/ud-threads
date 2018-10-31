@@ -3,7 +3,7 @@
 struct tcb {
   int         thread_id;
   int         thread_priority;
-  ucontext_t  thread_context;
+  ucontext_t* thread_context;
   struct tcb *next;
 };
 
@@ -32,7 +32,7 @@ void t_yield()
     runningQueue->next = NULL;
     current = readyQueue;
 
-    swapcontext(&last->thread_context, &runningQueue->thread_context);
+    swapcontext(last->thread_context, runningQueue->thread_context);
   }
 }
 
@@ -45,9 +45,10 @@ void t_init()
   getcontext(tmp);    /* let tmp be the context of main() */
   runningQueue->thread_id = 0;
   runningQueue->thread_priority = 0;
-  runningQueue->thread_context = *tmp;
+  runningQueue->thread_context = tmp;
   runningQueue->next = NULL;
   readyQueue = NULL;
+  /* free(tmp); */
 }
 
 int t_create(void (*fct)(int), int id, int pri)
@@ -66,7 +67,7 @@ int t_create(void (*fct)(int), int id, int pri)
   tcb* tmp = (tcb*) malloc(sizeof(tcb));
   tmp->thread_id = id;
   tmp->thread_priority = pri;
-  tmp->thread_context = *uc;
+  tmp->thread_context = uc;
 
   tcb* current = readyQueue;
   if(NULL == readyQueue) {
@@ -78,6 +79,7 @@ int t_create(void (*fct)(int), int id, int pri)
     }
     current->next = tmp;
   }
+  /* free(uc); */
   return 0;
 }
 
@@ -86,27 +88,27 @@ void t_shutdown() {
   tcb* next = current;
   while(NULL != current) {
     next = current->next;
-    free(current->thread_context.uc_stack.ss_sp);
-    /* free(&current->thread_context); */
+    free(current->thread_context->uc_stack.ss_sp);
+    free(current->thread_context);
     free(current);
     current = next;
   }
   if (NULL != runningQueue) {
-    free(runningQueue->thread_context.uc_stack.ss_sp);
-    /* free(&runningQueue->thread_context); */
+    free(runningQueue->thread_context->uc_stack.ss_sp);
+    free(runningQueue->thread_context);
     free(runningQueue);
   }
 }
 
 void t_terminate() {
   if (runningQueue != NULL) {
-    free(runningQueue->thread_context.uc_stack.ss_sp);
-    /* free(&(runningQueue->thread_context)); */
+    free(runningQueue->thread_context->uc_stack.ss_sp);
+    free(runningQueue->thread_context);
     free(runningQueue);
   }
   runningQueue = readyQueue;
   readyQueue = readyQueue->next;
   runningQueue->next = NULL;
-  setcontext(&runningQueue->thread_context);
+  setcontext(runningQueue->thread_context);
 }
 
