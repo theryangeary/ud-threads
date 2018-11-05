@@ -1,0 +1,12 @@
+in main(): 0
+in assign(1): 0
+in assign(1): 1
+in assign(1): 2
+in main(): 1
+in assign(2): 10
+in assign(2): 11
+in assign(2): 12
+in main(): 2
+in assign(3): 20
+in assign(3): 21
+in assign(3): 22
