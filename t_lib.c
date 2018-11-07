@@ -44,7 +44,7 @@ void t_init()
 
   getcontext(tmp);    /* let tmp be the context of main() */
   runningQueue->thread_id = 0;
-  runningQueue->thread_priority = 0;
+  runningQueue->thread_priority = 1;
   runningQueue->thread_context = tmp;
   runningQueue->next = NULL;
   readyQueue = NULL;
