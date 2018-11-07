@@ -83,28 +83,28 @@ int t_create(void (*fct)(int), int id, int pri)
   return 0;
 }
 
+void freeTcb(tcb* tmp) {
+  free(tmp->thread_context->uc_stack.ss_sp);
+  free(tmp->thread_context);
+  free(tmp);
+}
+
 void t_shutdown() {
   tcb* current = readyQueue;
   tcb* next = current;
   while(NULL != current) {
     next = current->next;
-    free(current->thread_context->uc_stack.ss_sp);
-    free(current->thread_context);
-    free(current);
+    freeTcb(current);
     current = next;
   }
   if (NULL != runningQueue) {
-    free(runningQueue->thread_context->uc_stack.ss_sp);
-    free(runningQueue->thread_context);
-    free(runningQueue);
+    freeTcb(runningQueue);
   }
 }
 
 void t_terminate() {
   if (runningQueue != NULL) {
-    free(runningQueue->thread_context->uc_stack.ss_sp);
-    free(runningQueue->thread_context);
-    free(runningQueue);
+    freeTcb(runningQueue);
   }
   runningQueue = readyQueue;
   readyQueue = readyQueue->next;
