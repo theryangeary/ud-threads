@@ -19,10 +19,10 @@ tests: test00.c test01.c test01x.c test01a.c test02.c test02a.c test03.c test04.
 	${CC} ${CFLAGS} test02.c t_lib.a -o test02
 	${CC} ${CFLAGS} test02a.c t_lib.a -o test02a
 	# ${CC} ${CFLAGS} test03.c t_lib.a -o test03
-	# ${CC} ${CFLAGS} test04.c t_lib.a -o test04
+	${CC} ${CFLAGS} test04.c t_lib.a -o test04
 	# ${CC} ${CFLAGS} test05.c t_lib.a -o test05
 	# ${CC} ${CFLAGS} test06.c t_lib.a -o test06
-	# ${CC} ${CFLAGS} test07.c t_lib.a -o test07
+	${CC} ${CFLAGS} test07.c t_lib.a -o test07
 	# ${CC} ${CFLAGS} test08.c t_lib.a -o test08
 	# ${CC} ${CFLAGS} test09.c t_lib.a -o test09
 	# ${CC} ${CFLAGS} test10.c t_lib.a -o test10
