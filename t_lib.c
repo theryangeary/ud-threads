@@ -83,15 +83,11 @@ int t_create(void (*fct)(int), int id, int pri)
   tmp->thread_priority = pri;
   tmp->thread_context = uc;
 
-  tcb* current = readyQueue;
   if(NULL == readyQueue) {
     readyQueue = tmp;
   }
   else {
-    while(NULL != current->next) {
-      current = current->next;
-    }
-    current->next = tmp;
+    readyQueue = insert(readyQueue, tmp);
   }
   /* free(uc); */
   return 0;
