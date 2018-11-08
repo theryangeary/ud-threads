@@ -12,6 +12,24 @@ typedef struct tcb tcb;
 tcb* readyQueue;
 tcb* runningQueue;
 
+tcb* insert(tcb* head, tcb* newTcb) {
+  // check first case
+  if(newTcb->thread_priority < head->thread_priority) {
+    newTcb->next = head;
+    return newTcb;
+  }
+  // check rest
+  tcb* current = head;
+  // find last queue item with this priority
+  while(current->next != NULL && current->next->thread_priority <= newTcb->thread_priority){
+    current = current->next;
+  }
+  // insert item
+  newTcb->next = current->next;
+  current->next = newTcb;
+  return head;
+}
+
 void t_yield()
 {
   tcb* current = readyQueue;
@@ -22,15 +40,11 @@ void t_yield()
     return;
   }
   else {
-    while(NULL != current->next) {
-      current = current->next;
-    }
-    current->next = runningQueue;
     tcb* last = runningQueue;
+    readyQueue = insert(readyQueue, runningQueue);
     runningQueue = readyQueue;
     readyQueue = readyQueue->next;
     runningQueue->next = NULL;
-    current = readyQueue;
 
     swapcontext(last->thread_context, runningQueue->thread_context);
   }
