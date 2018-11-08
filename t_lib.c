@@ -1,4 +1,9 @@
 #include "t_lib.h"
+#include <unistd.h>
+#include <stdint.h>
+#include <signal.h>
+
+const useconds_t interval = 1;
 
 struct tcb {
   int         thread_id;
@@ -40,18 +45,32 @@ void t_yield()
     return;
   }
   else {
+    /* sighold(SIGALRM); */
     tcb* last = runningQueue;
     readyQueue = insert(readyQueue, runningQueue);
     runningQueue = readyQueue;
     readyQueue = readyQueue->next;
     runningQueue->next = NULL;
 
+    ualarm(interval, 0);
+    /* sigrelse(SIGALRM); */
     swapcontext(last->thread_context, runningQueue->thread_context);
   }
 }
 
+void sigalrm_handler(int signal)
+{
+	/* sigset(SIGALRM, sigalrm_handler); */
+	/* printf("\nTIMER INTERRUPT...\n\n"); */
+  /* ualarm(interval, 0); */
+  t_yield();
+}
+
 void t_init()
 {
+  sigset(SIGALRM, sigalrm_handler);
+  ualarm(interval, 0);
+
   runningQueue = (tcb*) malloc(sizeof(tcb));
   ucontext_t *tmp;
   tmp = (ucontext_t *) malloc(sizeof(ucontext_t));
