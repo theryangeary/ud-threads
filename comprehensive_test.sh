@@ -9,14 +9,14 @@ echo "#############################################"
 for i in "${arr[@]}"
 do
     x=`./$i > output && diff outcomes/$i output | wc -l`
-    if [ $x != 0 ]
+    if [[ $x != 0 ]]
     then
         echo -e "${RED}$i has WRONG output${NC}"
 else
 	echo -e "${GREEN}$i has correct output${NC}"
     fi
     v=`valgrind ./$i |& grep "LEAK SUMMARY" | wc -l`
-    if [ $v != 0 ]
+    if [[ $v != 0 ]]
     then
         echo -e "${RED}$i has MEMORY LEAKS${NC}"
 else
