@@ -9,7 +9,7 @@ echo "#############################################"
 for i in "${arr[@]}"
 do
     x=`./$i > output && diff outcomes/$i output | wc -l`
-    if [ $x != 0 ]
+    if [[ $x != 0 ]]
     then
         echo -e "${RED}$i has WRONG output${NC}"
 else

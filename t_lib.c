@@ -1,4 +1,9 @@
 #include "t_lib.h"
+#include <unistd.h>
+#include <stdint.h>
+#include <signal.h>
+
+const useconds_t interval = 1;
 
 struct tcb {
   int         thread_id;
@@ -32,11 +37,13 @@ tcb* insert(tcb* head, tcb* newTcb) {
 
 void t_yield()
 {
+  sighold(SIGALRM);
   tcb* current = readyQueue;
 
   current = readyQueue;
   if (NULL == readyQueue) {
     runningQueue = readyQueue;
+    sigrelse(SIGALRM);
     return;
   }
   else {
@@ -46,8 +53,17 @@ void t_yield()
     readyQueue = readyQueue->next;
     runningQueue->next = NULL;
 
+    sigrelse(SIGALRM);
     swapcontext(last->thread_context, runningQueue->thread_context);
   }
+}
+
+void sigalrm_handler(int signal)
+{
+  printf("HELLO WORLD\n");
+  sigset(SIGALRM, sigalrm_handler);
+  ualarm(interval, 0);
+  //t_yield();
 }
 
 void t_init()
@@ -63,10 +79,13 @@ void t_init()
   runningQueue->next = NULL;
   readyQueue = NULL;
   /* free(tmp); */
+  sigset(SIGALRM, sigalrm_handler);
+  ualarm(interval, 0);
 }
 
 int t_create(void (*fct)(int), int id, int pri)
 {
+  sighold(SIGALRM);
   size_t sz = 0x10000;
 
   ucontext_t *uc;
@@ -89,6 +108,7 @@ int t_create(void (*fct)(int), int id, int pri)
   else {
     readyQueue = insert(readyQueue, tmp);
   }
+  sigrelse(SIGALRM);
   /* free(uc); */
   return 0;
 }
@@ -100,6 +120,7 @@ void freeTcb(tcb* tmp) {
 }
 
 void t_shutdown() {
+  sighold(SIGALRM);
   tcb* current = readyQueue;
   tcb* next = current;
   while(NULL != current) {
@@ -110,15 +131,18 @@ void t_shutdown() {
   if (NULL != runningQueue) {
     freeTcb(runningQueue);
   }
+  sigrelse(SIGALRM);
 }
 
 void t_terminate() {
+  sighold(SIGALRM);
   if (runningQueue != NULL) {
     freeTcb(runningQueue);
   }
   runningQueue = readyQueue;
   readyQueue = readyQueue->next;
   runningQueue->next = NULL;
+  sigrelse(SIGALRM);
   setcontext(runningQueue->thread_context);
 }
 
