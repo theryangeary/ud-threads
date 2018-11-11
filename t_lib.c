@@ -47,16 +47,12 @@ void t_yield()
     return;
   }
   else {
-    /* sighold(SIGALRM); */
     tcb* last = runningQueue;
     readyQueue = insert(readyQueue, runningQueue);
     runningQueue = readyQueue;
     readyQueue = readyQueue->next;
     runningQueue->next = NULL;
 
-    //ualarm(interval, 0);
-    /* sigrelse(SIGALRM); */
-    //printf("YELILD\n");
     sigrelse(SIGALRM);
     swapcontext(last->thread_context, runningQueue->thread_context);
   }
@@ -64,7 +60,7 @@ void t_yield()
 
 void sigalrm_handler(int signal)
 {
-  printf("HELLO WORLD\n"); 
+  printf("HELLO WORLD\n");
   sigset(SIGALRM, sigalrm_handler);
   ualarm(interval, 0);
   //t_yield();
@@ -72,9 +68,6 @@ void sigalrm_handler(int signal)
 
 void t_init()
 {
-  
-  //printf("AAAAA\n");
-
   runningQueue = (tcb*) malloc(sizeof(tcb));
   ucontext_t *tmp;
   tmp = (ucontext_t *) malloc(sizeof(ucontext_t));
