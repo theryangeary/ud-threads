@@ -60,10 +60,10 @@ void t_yield()
 
 void sigalrm_handler(int signal)
 {
-  printf("HELLO WORLD\n");
-  t_yield();
-  /* sigset(SIGALRM, sigalrm_handler); */
+  //printf("\nHELLO WORLD\n");
+  sigset(SIGALRM, sigalrm_handler);
   ualarm(interval, 0);
+  t_yield();
 }
 
 void t_init()
