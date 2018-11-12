@@ -37,22 +37,23 @@ tcb* insert(tcb* head, tcb* newTcb) {
 
 void t_yield()
 {
+  // entering critical section
   sighold(SIGALRM);
+  // cancel any upcoming alarm, if thread exited before its time was up
   ualarm(0,0);
+  // set new alarm for next thread
   useconds_t remainingTime = ualarm(interval,0);
-
-  //if(remainingTime != 0){
-    //ualarm(remainingTime, 0);
-  //}
 
   tcb* current = readyQueue;
 
   current = readyQueue;
+  // if ready is empty, move running to ready
   if (NULL == readyQueue) {
     runningQueue = readyQueue;
     sigrelse(SIGALRM);
     return;
   }
+  // otherwise shuffle accordingly
   else {
     tcb* last = runningQueue;
     readyQueue = insert(readyQueue, runningQueue);
@@ -60,6 +61,7 @@ void t_yield()
     readyQueue = readyQueue->next;
     runningQueue->next = NULL;
 
+    // exit critical section
     sigrelse(SIGALRM);
     swapcontext(last->thread_context, runningQueue->thread_context);
   }
@@ -67,14 +69,15 @@ void t_yield()
 
 void sigalrm_handler(int signal)
 {
-  //printf("\nHELLO WORLD\n");
+  // reset signal handling
   sigset(SIGALRM, sigalrm_handler);
-  //ualarm(interval, 0);
+  // yield the thread because its time on this earth has expired
   t_yield();
 }
 
 void t_init()
 {
+  // create a main thread and start running it
   runningQueue = (tcb*) malloc(sizeof(tcb));
   ucontext_t *tmp;
   tmp = (ucontext_t *) malloc(sizeof(ucontext_t));
@@ -85,7 +88,7 @@ void t_init()
   runningQueue->thread_context = tmp;
   runningQueue->next = NULL;
   readyQueue = NULL;
-  /* free(tmp); */
+  // start a timer so no thread can run forever
   sigset(SIGALRM, sigalrm_handler);
   ualarm(interval, 0);
 }
