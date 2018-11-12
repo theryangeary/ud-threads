@@ -38,6 +38,13 @@ tcb* insert(tcb* head, tcb* newTcb) {
 void t_yield()
 {
   sighold(SIGALRM);
+  ualarm(0,0);
+  useconds_t remainingTime = ualarm(interval,0);
+
+  //if(remainingTime != 0){
+    //ualarm(remainingTime, 0);
+  //}
+
   tcb* current = readyQueue;
 
   current = readyQueue;
@@ -62,7 +69,7 @@ void sigalrm_handler(int signal)
 {
   //printf("\nHELLO WORLD\n");
   sigset(SIGALRM, sigalrm_handler);
-  ualarm(interval, 0);
+  //ualarm(interval, 0);
   t_yield();
 }
 

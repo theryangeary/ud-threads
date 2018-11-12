@@ -19,6 +19,7 @@ void thread_function(int val) {
 
       for(i = 0; i < 10000000; i++);
       printf("I am thread %d...\n", val);
+      fflush(stdout);
    }
 }
 
@@ -33,6 +34,7 @@ int main(void){
 
       for(i = 0; i < 10000000; i++);
       printf("I am main...\n");
+      fflush(stdout);
    }
 
    return 0;
