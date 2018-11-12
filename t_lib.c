@@ -123,6 +123,7 @@ int t_create(void (*fct)(int), int id, int pri)
   return 0;
 }
 
+//Free a thread control block
 void freeTcb(tcb* tmp) {
   free(tmp->thread_context->uc_stack.ss_sp);
   free(tmp->thread_context);
@@ -130,29 +131,32 @@ void freeTcb(tcb* tmp) {
 }
 
 void t_shutdown() {
-  /* sighold(SIGALRM); */
   tcb* current = readyQueue;
   tcb* next = current;
+  //Loop through both the ready queue and free all threads
   while(NULL != current) {
     next = current->next;
     freeTcb(current);
     current = next;
   }
+
+  //Free running queue head
   if (NULL != runningQueue) {
     freeTcb(runningQueue);
   }
-  /* sigrelse(SIGALRM); */
 }
 
+
 void t_terminate() {
-  /* sighold(SIGALRM); */
+  //Free the currently running thread from the running queue
   if (runningQueue != NULL) {
     freeTcb(runningQueue);
   }
+  //Put the next thread on the ready queue onto the running queue
   runningQueue = readyQueue;
   readyQueue = readyQueue->next;
   runningQueue->next = NULL;
-  /* sigrelse(SIGALRM); */
+  //Switch to new head
   setcontext(runningQueue->thread_context);
 }
 
