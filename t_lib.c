@@ -1,3 +1,5 @@
+// Writen by Ryan Geary and James Skripchuk (c) 2018
+
 #include "t_lib.h"
 #include <unistd.h>
 #include <stdint.h>
