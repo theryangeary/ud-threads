@@ -153,3 +153,24 @@ void t_terminate() {
   setcontext(runningQueue->thread_context);
 }
 
+int sem_init(sem_t **sp, int sem_count)
+{
+  *sp = malloc(sizeof(sem_t));
+  (*sp)->count = sem_count;
+  (*sp)->q = NULL;
+}
+
+void sem_wait(sem_t *s)
+{
+
+}
+
+void sem_signal(sem_t *s)
+{
+
+}
+
+void sem_destroy(sem_t **s)
+{
+
+}
