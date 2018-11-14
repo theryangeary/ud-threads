@@ -1,0 +1,107 @@
+Philosopher 1 is hungry
+Philosopher 1 has picked up left  fork 2
+Philosopher 1 has picked up right fork 1
+Philosopher 2 is hungry
+Philosopher 3 is hungry
+Philosopher 3 has picked up left  fork 4
+Philosopher 3 has picked up right fork 3
+Philosopher 0 is hungry
+Philosopher 0 has picked up right fork 0
+Philosopher 4 is hungry
+Philosopher 1 is still eating
+Philosopher 3 is still eating
+Philosopher 1 is still eating
+Philosopher 3 is still eating
+Philosopher 1 is still eating
+Philosopher 3 is still eating
+Philosopher 0 has picked up left  fork 1
+Philosopher 4 has picked up right fork 4
+Philosopher 3 has eaten
+Philosopher 0 is still eating
+Philosopher 2 has picked up right fork 2
+Philosopher 2 has picked up left  fork 3
+Philosopher 1 has eaten
+Philosopher 0 is still eating
+Philosopher 2 is still eating
+Philosopher 0 is still eating
+Philosopher 2 is still eating
+ERROR: fork 0 is being used
+
+Philosopher 0 is hungry
+Philosopher 0 has picked up right fork 0
+Philosopher 0 has picked up left  fork 1
+Philosopher 4 is hungry
+Philosopher 4 has picked up right fork 4
+Philosopher 1 is hungry
+Philosopher 1 has picked up left  fork 2
+Philosopher 3 is hungry
+Philosopher 2 is hungry
+Philosopher 0 is still eating
+Philosopher 0 is still eating
+Philosopher 0 is still eating
+ERROR: fork 0 is being used
+
+Philosopher 3 is hungry
+Philosopher 3 has picked up left  fork 4
+Philosopher 3 has picked up right fork 3
+Philosopher 4 is hungry
+Philosopher 1 is hungry
+Philosopher 1 has picked up left  fork 2
+Philosopher 1 has picked up right fork 1
+Philosopher 0 is hungry
+Philosopher 0 has picked up right fork 0
+Philosopher 2 is hungry
+Philosopher 3 is still eating
+Philosopher 1 is still eating
+Philosopher 3 is still eating
+Philosopher 1 is still eating
+Philosopher 3 is still eating
+Philosopher 1 is still eating
+Philosopher 4 has picked up right fork 4
+Philosopher 3 has eaten
+Philosopher 0 has picked up left  fork 1
+Philosopher 0 is still eating
+Philosopher 2 has picked up right fork 2
+Philosopher 2 has picked up left  fork 3
+Philosopher 1 has eaten
+Philosopher 0 is still eating
+Philosopher 2 is still eating
+Philosopher 0 is still eating
+Philosopher 2 is still eating
+ERROR: fork 0 is being used
+
+Philosopher 3 is hungry
+Philosopher 3 has picked up left  fork 4
+Philosopher 3 has picked up right fork 3
+Philosopher 2 is hungry
+Philosopher 2 has picked up right fork 2
+Philosopher 4 is hungry
+Philosopher 0 is hungry
+Philosopher 0 has picked up right fork 0
+Philosopher 0 has picked up left  fork 1
+Philosopher 1 is hungry
+Philosopher 3 is still eating
+Philosopher 0 is still eating
+Philosopher 3 is still eating
+Philosopher 0 is still eating
+Philosopher 3 is still eating
+Philosopher 0 is still eating
+Philosopher 0 has eaten
+Philosopher 2 has picked up left  fork 3
+Philosopher 2 is still eating
+Philosopher 4 has picked up right fork 4
+Philosopher 4 has picked up left  fork 0
+Philosopher 3 has eaten
+Philosopher 2 is still eating
+Philosopher 4 is still eating
+Philosopher 2 is still eating
+Philosopher 4 is still eating
+Philosopher 1 has picked up left  fork 2
+Philosopher 1 has picked up right fork 1
+Philosopher 2 has eaten
+Philosopher 4 is still eating
+Philosopher 4 has eaten
+Philosopher 1 is still eating
+Philosopher 1 is still eating
+Philosopher 1 is still eating
+Philosopher 1 has eaten
