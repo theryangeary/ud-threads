@@ -6,3 +6,5 @@ void t_yield(void);
 void t_init(void);
 void t_shutdown(void);
 void t_terminate(void);
+
+typedef void sem_t;
