@@ -18,7 +18,7 @@ tests: test00.c test01.c test01x.c test01a.c test02.c test02a.c test03.c test04.
 	${CC} ${CFLAGS} test01a.c t_lib.a -o test01a
 	${CC} ${CFLAGS} test02.c t_lib.a -o test02
 	${CC} ${CFLAGS} test02a.c t_lib.a -o test02a
-	# ${CC} ${CFLAGS} test03.c t_lib.a -o test03
+	${CC} ${CFLAGS} test03.c t_lib.a -o test03
 	${CC} ${CFLAGS} test04.c t_lib.a -o test04
 	# ${CC} ${CFLAGS} test05.c t_lib.a -o test05
 	# ${CC} ${CFLAGS} test06.c t_lib.a -o test06
