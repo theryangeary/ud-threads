@@ -160,12 +160,23 @@ int sem_init(sem_t **sp, int sem_count)
   (*sp)->q = NULL;
 }
 
-tcb* wakeTcb(tcb* head) {
-  return head;
-}
-
-tcb* sleepTcb(tcb* head) {
-  return head;
+void sleepTcb(sem_t* s)
+{
+  tcb* current = s->q;
+  if (NULL == s->q) {
+    s->q = runningQueue;
+    current = s->q;
+  }
+  else {
+    while(current->next != NULL) {
+      current = current->next;
+    }
+    current->next = runningQueue;
+  }
+  runningQueue = readyQueue;
+  readyQueue = readyQueue->next;
+  runningQueue->next = NULL;
+  swapcontext(current->thread_context, runningQueue->thread_context);
 }
 
 void sem_wait(sem_t *s)
@@ -173,7 +184,7 @@ void sem_wait(sem_t *s)
   sighold();
   s->count--;
   if (s->count < 0) {
-    sleepTcb(s->q);
+    sleepTcb(s);
     sigrelse();
   }
   else {
@@ -181,12 +192,22 @@ void sem_wait(sem_t *s)
   }
 }
 
+tcb* wakeTcb(tcb* head) {
+  if (NULL == head) {
+    return head;
+  }
+  tcb* current = head;
+  head = head->next;
+  readyQueue = insert(readyQueue, current);
+  return head;
+}
+
 void sem_signal(sem_t *s)
 {
   sighold();
   s->count++;
   if (s->count <= 0) {
-    wakeTcb(s->q);
+    s->q = wakeTcb(s->q);
     sigrelse();
   }
   sigrelse();
