@@ -160,17 +160,39 @@ int sem_init(sem_t **sp, int sem_count)
   (*sp)->q = NULL;
 }
 
+tcb* wakeTcb(tcb* head) {
+  return head;
+}
+
+tcb* sleepTcb(tcb* head) {
+  return head;
+}
+
 void sem_wait(sem_t *s)
 {
-
+  sighold();
+  s->count--;
+  if (s->count < 0) {
+    sleepTcb(s->q);
+    sigrelse();
+  }
+  else {
+    sigrelse();
+  }
 }
 
 void sem_signal(sem_t *s)
 {
-
+  sighold();
+  s->count++;
+  if (s->count <= 0) {
+    wakeTcb(s->q);
+    sigrelse();
+  }
+  sigrelse();
 }
 
 void sem_destroy(sem_t **s)
 {
-  free(*sp);
+  free(*s);
 }
