@@ -28,6 +28,7 @@ tests: test00.c test01.c test01x.c test01a.c test02.c test02a.c test03.c test04.
 	# ${CC} ${CFLAGS} test10.c t_lib.a -o test10
 	# ${CC} ${CFLAGS} test11.c t_lib.a -o test11
 	${CC} ${CFLAGS} philosophers.c t_lib.a -o philosophers
+	${CC} ${CFLAGS} 3test.c t_lib.a -o shone
 	./comprehensive_test.sh
 
 # specify the source files
