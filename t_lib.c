@@ -33,9 +33,9 @@ void t_yield()
   // entering critical section
   sighold(SIGALRM);
   // cancel any upcoming alarm, if thread exited before its time was up
-  ualarm(0,0);
+  //ualarm(0,0);
   // set new alarm for next thread
-  useconds_t remainingTime = ualarm(interval,0);
+  //useconds_t remainingTime = ualarm(interval,0);
 
   tcb* current = readyQueue;
 
@@ -83,7 +83,7 @@ void t_init()
   readyQueue = NULL;
   // start a timer so no thread can run forever
   sigset(SIGALRM, sigalrm_handler);
-  ualarm(interval, 0);
+  //ualarm(interval, 0);
 }
 
 int t_create(void (*fct)(int), int id, int pri)
