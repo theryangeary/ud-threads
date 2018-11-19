@@ -42,7 +42,6 @@ void t_yield()
   current = readyQueue;
   // if ready is empty, move running to ready
   if (NULL == readyQueue) {
-    runningQueue = readyQueue;
     sigrelse(SIGALRM);
     return;
   }
