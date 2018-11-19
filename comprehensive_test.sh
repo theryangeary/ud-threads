@@ -3,7 +3,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
-declare -a arr=("test00" "test01" "test01x" "test01a" "test07" "test02" "test03" "philosophers") #"test04""test02a" "test03" "test05" "test06" "test08" "test09" "test10" "test11")
+declare -a arr=("test00" "test01" "test01x" "test01a" "test07" "test02" "test03" "philosophers" "shone") #"test04""test02a" "test03" "test05" "test06" "test08" "test09" "test10" "test11")
 
 echo "#############################################"
 for i in "${arr[@]}"
