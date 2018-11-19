@@ -173,10 +173,11 @@ void sleepTcb(sem_t* s)
     }
     current->next = runningQueue;
   }
+  tcb* last = runningQueue;
   runningQueue = readyQueue;
   readyQueue = readyQueue->next;
   runningQueue->next = NULL;
-  swapcontext(current->thread_context, runningQueue->thread_context);
+  swapcontext(last->thread_context, runningQueue->thread_context);
 }
 
 void sem_wait(sem_t *s)
