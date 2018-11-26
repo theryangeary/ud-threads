@@ -1,13 +1,13 @@
-# Makefile for UD CISC user-level thread library
+#Makefile for UD CISC user-level thread library
 
 CC = gcc
 CFLAGS = -g
 
-LIBOBJS = t_lib.o 
+LIBOBJS = t_lib.o
 
-TSTOBJS = test00.o 
+TSTOBJS = test00.o
 
-# specify the executable 
+# specify the executable
 
 EXECS = test00 test01 test01x test01a test02 test02a test03 test04 test05 test06 test07 test08 test09 test10 test11
 
@@ -20,10 +20,10 @@ tests: test00.c test01.c test01x.c test01a.c test02.c test02a.c test03.c test04.
 	${CC} ${CFLAGS} test02a.c t_lib.a -o test02a
 	${CC} ${CFLAGS} test03.c t_lib.a -o test03
 	${CC} ${CFLAGS} test04.c t_lib.a -o test04
-	# ${CC} ${CFLAGS} test05.c t_lib.a -o test05
-	# ${CC} ${CFLAGS} test06.c t_lib.a -o test06
+	${CC} ${CFLAGS} test05.c t_lib.a -o test05
+	${CC} ${CFLAGS} test06.c t_lib.a -o test06
 	${CC} ${CFLAGS} test07.c t_lib.a -o test07
-	# ${CC} ${CFLAGS} test08.c t_lib.a -o test08
+	${CC} ${CFLAGS} test08.c t_lib.a -o test08
 	# ${CC} ${CFLAGS} test09.c t_lib.a -o test09
 	# ${CC} ${CFLAGS} test10.c t_lib.a -o test10
 	# ${CC} ${CFLAGS} test11.c t_lib.a -o test11
@@ -52,4 +52,4 @@ make daemon:
 	./continuous-make.sh
 
 clean:
-	rm -f t_lib.a ${EXECS} ${LIBOBJS} ${TSTOBJS} 
+	rm -f t_lib.a ${EXECS} ${LIBOBJS} ${TSTOBJS}
