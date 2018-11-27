@@ -218,20 +218,57 @@ void sem_destroy(sem_t **s)
   free(*s);
 }
 
-int mbox_create(mbox **mb) {
+void mailboxInsert(mbox* mailbox, struct messageNode* msg) {
+  struct messageNode* head = mailbox->msg;
+  if (NULL == head) {
+    mailbox->msg = msg;
+  }
+  else {
+    struct messageNode* current = mailbox->msg;
+    while(current->next != NULL) {
+      current = current->next;
+    }
+    current->next = msg;
+  }
+}
 
+struct messageNode* mailboxDequeue(mbox* mailbox) {
+  struct messageNode* current = mailbox->msg;
+  mailbox->msg = mailbox->msg->next;
+  return current;
+}
+
+int mbox_create(mbox **mb) {
+  *mb = malloc(sizeof(mbox));
+  sem_init(&((*mb)->mbox_sem), 0);
+  return 0;
 }
 
 void mbox_destroy(mbox **mb) {
-
+  struct messageNode* current = (*mb)->msg;
+  while(NULL != current) {
+    free(current->message);
+    free(current);
+  }
+  sem_destroy(&((*mb)->mbox_sem));
+  free(*mb);
 }
 
 void mbox_deposit(mbox *mb, char *msg, int len) {
-
+  struct messageNode* msgNode = malloc(sizeof(struct messageNode));
+  msgNode->len = len;
+  msgNode->message = (char*) malloc(len*sizeof(char));
+  strcpy(msgNode->message, msg);
+  mailboxInsert(mb, msgNode);
 }
 
 void mbox_withdraw(mbox *mb, char *msg, int *len) {
-
+  if (NULL == mb->msg) {
+    *len = 0;
+  }
+  struct messageNode* mail = mailboxDequeue(mb);
+  strncpy(msg, mail->message, mail->len);
+  *len = mail->len;
 }
 
 
