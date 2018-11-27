@@ -1,4 +1,4 @@
-/* 
+/*
  * thread library function prototypes
  */
 void t_create(void(*function)(int), int thread_id, int priority);
@@ -8,3 +8,5 @@ void t_shutdown(void);
 void t_terminate(void);
 
 typedef void sem_t;
+
+typedef void mbox;
