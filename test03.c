@@ -1,4 +1,4 @@
-/* 
+/*
  * Test Program #3 - Semaphore
  */
 
@@ -9,7 +9,7 @@
 sem_t *s;
 int resource = 0;
 
-void read_function(int val) 
+void read_function(int val)
 {
    long i, j ;
    int res_before, res_after;
@@ -18,7 +18,7 @@ void read_function(int val)
       printf("I am READ thread %d (%d)\n", val, i);
 
       sem_wait(s);
-            
+
       res_before = resource;
       printf("  [%d READ %d] resource = %d\n", val, i, resource);
 
@@ -38,7 +38,7 @@ void read_function(int val)
    t_terminate () ;
 }
 
-void write_function(int val) 
+void write_function(int val)
 {
    long i, j ;
 
@@ -46,8 +46,8 @@ void write_function(int val)
       printf("I am WRITE thread %d (%d)\n", val, i);
 
       sem_wait(s);
-            
-      resource = rand() % 100;      
+
+      resource = rand() % 100;
       printf("  [%d WRITE %d] resource = %d\n", val, i, resource);
 
       sem_signal(s);
@@ -73,7 +73,7 @@ int main(void) {
    t_create(write_function, 4, 1);
    t_create(read_function, 33, 1);
    t_create(read_function, 44, 1);
-  
+
    for (i = 0; i < 60; i++) {
       printf("I am main thread (%d)...\n", i);
       t_yield();
