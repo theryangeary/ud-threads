@@ -11,6 +11,7 @@ struct tcb {
   int         thread_priority;
   ucontext_t* thread_context;
   struct tcb *next;
+  struct mbox* mailbox;
 };
 
 typedef struct tcb tcb;

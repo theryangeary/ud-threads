@@ -6,9 +6,10 @@
 #include <signal.h>
 
 const useconds_t interval = 500;
-
 tcb* readyQueue;
 tcb* runningQueue;
+mbox* tid_map[100];
+
 
 tcb* insert(tcb* head, tcb* newTcb) {
   // check first case
@@ -69,6 +70,9 @@ void sigalrm_handler(int signal)
 
 void t_init()
 {
+  for(int i = 0; i < 100; i++){
+    tid_map[i] = NULL;
+  }
   // create a main thread and start running it
   runningQueue = (tcb*) malloc(sizeof(tcb));
   ucontext_t *tmp;
@@ -80,6 +84,8 @@ void t_init()
   runningQueue->thread_context = tmp;
   runningQueue->next = NULL;
   readyQueue = NULL;
+
+  mbox_create(&tid_map[0]);
   // start a timer so no thread can run forever
   sigset(SIGALRM, sigalrm_handler);
   //ualarm(interval, 0);
@@ -103,6 +109,8 @@ int t_create(void (*fct)(int), int id, int pri)
   tmp->thread_id = id;
   tmp->thread_priority = pri;
   tmp->thread_context = uc;
+  mbox_create(&tid_map[id]);
+
 
   if(NULL == readyQueue) {
     readyQueue = tmp;
@@ -132,6 +140,13 @@ void t_shutdown() {
     current = next;
   }
 
+  //TODO: free tid_map 
+  // for(int i = 0; i < 100; i++){
+  //   if(tid_map[i] != NULL){
+  //       mbox_destroy(&tid_map[i]);
+  //   }
+  // }
+
   //Free running queue head
   if (NULL != runningQueue) {
     freeTcb(runningQueue);
@@ -140,6 +155,7 @@ void t_shutdown() {
 
 
 void t_terminate() {
+  // tid_map[runningQueue->thread_id] = NULL;
   //Free the currently running thread from the running queue
   if (runningQueue != NULL) {
     freeTcb(runningQueue);
@@ -149,6 +165,7 @@ void t_terminate() {
   readyQueue = readyQueue->next;
   runningQueue->next = NULL;
   //Switch to new head
+
   setcontext(runningQueue->thread_context);
 }
 
@@ -238,7 +255,9 @@ void mailboxInsert(mbox* mailbox, struct messageNode* msg) {
 struct messageNode* mailboxDequeue(mbox* mailbox) {
   /*sem_wait(mailbox->mbox_sem);*/
   struct messageNode* current = mailbox->msg;
-  mailbox->msg = mailbox->msg->next;
+  if(NULL != current){
+    mailbox->msg = mailbox->msg->next;
+  }
   /*sem_signal(mailbox->mbox_sem);*/
   return current;
 }
@@ -269,20 +288,31 @@ void mbox_deposit(mbox *mb, char *msg, int len) {
 }
 
 void mbox_withdraw(mbox *mb, char *msg, int *len) {
+  //printf("Withdrawling\n");
   if (NULL == mb->msg) {
     *len = 0;
   }
   struct messageNode* mail = mailboxDequeue(mb);
-  strncpy(msg, mail->message, mail->len + 1);
-  *len = mail->len;
+  if(mail != NULL){
+    //printf("f: %s\n", mail->message);
+    strncpy(msg, mail->message, mail->len + 1);
+    *len = mail->len;
+  }
 }
 
 
 void send(int tid, char *msg, int len) {
-
+  if(tid_map[tid] != NULL){
+    mbox_deposit(tid_map[tid], msg, len);
+  }  
 }
 
 void receive(int *tid, char *msg, int *len) {
-
+  *len = 0;
+  while(*len == 0){
+    mbox_withdraw(tid_map[*tid], msg, len);
+    // printf("withdrawed %s\n", msg);
+    t_yield();
+  }
 }
 
