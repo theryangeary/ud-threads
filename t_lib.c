@@ -219,6 +219,8 @@ void sem_destroy(sem_t **s)
 }
 
 void mailboxInsert(mbox* mailbox, struct messageNode* msg) {
+  // TODO fix semaphores
+  /*sem_wait(mailbox->mbox_sem);*/
   struct messageNode* head = mailbox->msg;
   if (NULL == head) {
     mailbox->msg = msg;
@@ -230,11 +232,14 @@ void mailboxInsert(mbox* mailbox, struct messageNode* msg) {
     }
     current->next = msg;
   }
+  /*sem_signal(mailbox->mbox_sem);*/
 }
 
 struct messageNode* mailboxDequeue(mbox* mailbox) {
+  /*sem_wait(mailbox->mbox_sem);*/
   struct messageNode* current = mailbox->msg;
   mailbox->msg = mailbox->msg->next;
+  /*sem_signal(mailbox->mbox_sem);*/
   return current;
 }
 
