@@ -259,6 +259,7 @@ void mbox_deposit(mbox *mb, char *msg, int len) {
   msgNode->len = len;
   msgNode->message = (char*) malloc(len*sizeof(char));
   strcpy(msgNode->message, msg);
+  msgNode->next = NULL;
   mailboxInsert(mb, msgNode);
 }
 
@@ -267,7 +268,7 @@ void mbox_withdraw(mbox *mb, char *msg, int *len) {
     *len = 0;
   }
   struct messageNode* mail = mailboxDequeue(mb);
-  strncpy(msg, mail->message, mail->len);
+  strncpy(msg, mail->message, mail->len + 1);
   *len = mail->len;
 }
 
