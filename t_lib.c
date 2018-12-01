@@ -264,7 +264,7 @@ struct messageNode* mailboxDequeue(mbox* mailbox) {
 
 int mbox_create(mbox **mb) {
   *mb = malloc(sizeof(mbox));
-  sem_init(&((*mb)->mbox_sem), 0);
+  sem_init(&((*mb)->mbox_sem), SEM_LOCK_INIT);
   return 0;
 }
 
@@ -300,9 +300,11 @@ void mbox_withdraw(mbox *mb, char *msg, int *len) {
 }
 
 void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
+  sem_wait(mb->mbox_sem);
   if (NULL == mb->msg) {
     *len = 0;
     *sender = 0;
+    sem_signal(mb->mbox_sem);
     return;
   }
   if (*sender  == 0) {
@@ -310,6 +312,7 @@ void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
     *sender = msgNode->sender;
     strncpy(msg, msgNode->message, strlen(msgNode->message));
     *len = msgNode->len;
+    sem_signal(mb->mbox_sem);
     return;
   }
   struct messageNode* current = mb->msg;
@@ -321,6 +324,7 @@ void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
     struct messageNode* toDelete = current;
     free(toDelete->message);
     free(toDelete);
+    sem_signal(mb->mbox_sem);
   }
   else {
     while (current->next != NULL) {
@@ -339,6 +343,7 @@ void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
         current = current->next;
       }
     }
+    sem_signal(mb->mbox_sem);
   }
 }
 

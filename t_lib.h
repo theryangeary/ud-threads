@@ -6,6 +6,8 @@
 #include <ucontext.h>
 #include <sys/mman.h>
 
+#define SEM_LOCK_INIT 1
+
 struct tcb {
   int         thread_id;
   int         thread_priority;
