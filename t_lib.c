@@ -282,37 +282,81 @@ void mbox_deposit(mbox *mb, char *msg, int len) {
   struct messageNode* msgNode = malloc(sizeof(struct messageNode));
   msgNode->len = len;
   msgNode->message = (char*) malloc(len*sizeof(char));
+  msgNode->sender = runningQueue->thread_id;
   strcpy(msgNode->message, msg);
   msgNode->next = NULL;
   mailboxInsert(mb, msgNode);
 }
 
 void mbox_withdraw(mbox *mb, char *msg, int *len) {
-  //printf("Withdrawling\n");
   if (NULL == mb->msg) {
     *len = 0;
   }
   struct messageNode* mail = mailboxDequeue(mb);
   if(mail != NULL){
-    //printf("f: %s\n", mail->message);
     strncpy(msg, mail->message, mail->len + 1);
-    *len = mail->len;
+    *len = mail->len + 1;
   }
 }
 
+void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
+  if (NULL == mb->msg) {
+    *len = 0;
+    *sender = 0;
+    return;
+  }
+  if (*sender  == 0) {
+    struct messageNode* msgNode = mailboxDequeue(mb);
+    *sender = msgNode->sender;
+    strncpy(msg, msgNode->message, strlen(msgNode->message));
+    *len = msgNode->len;
+    return;
+  }
+  struct messageNode* current = mb->msg;
+  if (mb->msg->sender == *sender) {
+    strncpy(msg, current->message, strlen(current->message));
+    *len = current->len;
+
+    mb->msg = mb->msg->next;
+    struct messageNode* toDelete = current;
+    free(toDelete->message);
+    free(toDelete);
+  }
+  else {
+    while (current->next != NULL) {
+      if (current->next->sender == *sender) {
+        strncpy(msg, current->next->message, strlen(current->next->message));
+        *len = current->next->len;
+
+        struct messageNode* toDelete = current->next;
+        free(toDelete->message);
+        free(toDelete);
+
+        current->next = current->next->next;
+        break;
+      }
+      else {
+        current = current->next;
+      }
+    }
+  }
+}
 
 void send(int tid, char *msg, int len) {
   if(tid_map[tid] != NULL){
     mbox_deposit(tid_map[tid], msg, len);
-  }  
+  }
 }
 
 void receive(int *tid, char *msg, int *len) {
   *len = 0;
-  while(*len == 0){
-    mbox_withdraw(tid_map[*tid], msg, len);
-    // printf("withdrawed %s\n", msg);
-    t_yield();
+  if (0 == *tid) {
+    mbox_withdraw_by_sender(tid_map[runningQueue->thread_id], msg, len, tid);
+    /*t_yield();*/
+  }
+  else {
+    mbox_withdraw_by_sender(tid_map[runningQueue->thread_id], msg, len, tid);
+    /*t_yield();*/
   }
 }
 
