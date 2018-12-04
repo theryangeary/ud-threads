@@ -235,6 +235,7 @@ void sem_destroy(sem_t **s)
   free(*s);
 }
 
+// put message in mailbox
 void mailboxInsert(mbox* mailbox, struct messageNode* msg) {
   // TODO fix semaphores
   /*sem_wait(mailbox->mbox_sem);*/
@@ -252,6 +253,7 @@ void mailboxInsert(mbox* mailbox, struct messageNode* msg) {
   /*sem_signal(mailbox->mbox_sem);*/
 }
 
+// dequeue msg from mailbox
 struct messageNode* mailboxDequeue(mbox* mailbox) {
   sem_wait(mailbox->mbox_sem);
   struct messageNode* current = mailbox->msg;
@@ -262,12 +264,14 @@ struct messageNode* mailboxDequeue(mbox* mailbox) {
   return current;
 }
 
+// make space for mbox
 int mbox_create(mbox **mb) {
   *mb = malloc(sizeof(mbox));
   sem_init(&((*mb)->mbox_sem), SEM_LOCK_INIT);
   return 0;
 }
 
+// free memory for mbox
 void mbox_destroy(mbox **mb) {
   struct messageNode* current = (*mb)->msg;
   while(NULL != current) {
@@ -278,6 +282,7 @@ void mbox_destroy(mbox **mb) {
   free(*mb);
 }
 
+// put message in mailbox
 void mbox_deposit(mbox *mb, char *msg, int len) {
   sem_wait(mb->mbox_sem);
   struct messageNode* msgNode = malloc(sizeof(struct messageNode));
@@ -290,6 +295,7 @@ void mbox_deposit(mbox *mb, char *msg, int len) {
   sem_signal(mb->mbox_sem);
 }
 
+// withdraw first message
 void mbox_withdraw(mbox *mb, char *msg, int *len) {
   if (NULL == mb->msg) {
     *len = 0;
@@ -301,6 +307,7 @@ void mbox_withdraw(mbox *mb, char *msg, int *len) {
   }
 }
 
+// receive message from specific thread
 void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
   if (NULL == mb->msg) {
     *len = 0;
@@ -346,12 +353,14 @@ void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
   sem_signal(mb->mbox_sem);
 }
 
+// send message to thread with tid
 void send(int tid, char *msg, int len) {
   if(tid_map[tid] != NULL){
     mbox_deposit(tid_map[tid], msg, len);
   }
 }
 
+// receive message sent by tid, store in msg
 void receive(int *tid, char *msg, int *len) {
   *len = 0;
   if (0 == *tid) {
