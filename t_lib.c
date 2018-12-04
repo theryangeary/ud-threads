@@ -253,12 +253,12 @@ void mailboxInsert(mbox* mailbox, struct messageNode* msg) {
 }
 
 struct messageNode* mailboxDequeue(mbox* mailbox) {
-  /*sem_wait(mailbox->mbox_sem);*/
+  sem_wait(mailbox->mbox_sem);
   struct messageNode* current = mailbox->msg;
   if(NULL != current){
     mailbox->msg = mailbox->msg->next;
   }
-  /*sem_signal(mailbox->mbox_sem);*/
+  sem_signal(mailbox->mbox_sem);
   return current;
 }
 
@@ -279,6 +279,7 @@ void mbox_destroy(mbox **mb) {
 }
 
 void mbox_deposit(mbox *mb, char *msg, int len) {
+  sem_wait(mb->mbox_sem);
   struct messageNode* msgNode = malloc(sizeof(struct messageNode));
   msgNode->len = len;
   msgNode->message = (char*) malloc(len*sizeof(char));
@@ -286,6 +287,7 @@ void mbox_deposit(mbox *mb, char *msg, int len) {
   strcpy(msgNode->message, msg);
   msgNode->next = NULL;
   mailboxInsert(mb, msgNode);
+  sem_signal(mb->mbox_sem);
 }
 
 void mbox_withdraw(mbox *mb, char *msg, int *len) {
@@ -300,11 +302,9 @@ void mbox_withdraw(mbox *mb, char *msg, int *len) {
 }
 
 void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
-  sem_wait(mb->mbox_sem);
   if (NULL == mb->msg) {
     *len = 0;
     *sender = 0;
-    sem_signal(mb->mbox_sem);
     return;
   }
   if (*sender  == 0) {
@@ -312,10 +312,10 @@ void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
     *sender = msgNode->sender;
     strncpy(msg, msgNode->message, strlen(msgNode->message));
     *len = msgNode->len;
-    sem_signal(mb->mbox_sem);
     return;
   }
   struct messageNode* current = mb->msg;
+  sem_wait(mb->mbox_sem);
   if (mb->msg->sender == *sender) {
     strncpy(msg, current->message, strlen(current->message));
     *len = current->len;
@@ -324,7 +324,6 @@ void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
     struct messageNode* toDelete = current;
     free(toDelete->message);
     free(toDelete);
-    sem_signal(mb->mbox_sem);
   }
   else {
     while (current->next != NULL) {
@@ -343,8 +342,8 @@ void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
         current = current->next;
       }
     }
-    sem_signal(mb->mbox_sem);
   }
+  sem_signal(mb->mbox_sem);
 }
 
 void send(int tid, char *msg, int len) {
