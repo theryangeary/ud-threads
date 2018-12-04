@@ -8,6 +8,8 @@
 const useconds_t interval = 500;
 tcb* readyQueue;
 tcb* runningQueue;
+
+//Each thread has it's own mailbox (we're assuming no more than 100 threads)
 mbox* tid_map[100];
 
 
@@ -109,6 +111,8 @@ int t_create(void (*fct)(int), int id, int pri)
   tmp->thread_id = id;
   tmp->thread_priority = pri;
   tmp->thread_context = uc;
+
+  //initilize the mailbox for this thread
   mbox_create(&tid_map[id]);
 
 
@@ -238,6 +242,7 @@ void sem_destroy(sem_t **s)
 void mailboxInsert(mbox* mailbox, struct messageNode* msg) {
   // TODO fix semaphores
   /*sem_wait(mailbox->mbox_sem);*/
+  //Insert a message into our mailbox
   struct messageNode* head = mailbox->msg;
   if (NULL == head) {
     mailbox->msg = msg;
@@ -254,6 +259,7 @@ void mailboxInsert(mbox* mailbox, struct messageNode* msg) {
 
 struct messageNode* mailboxDequeue(mbox* mailbox) {
   /*sem_wait(mailbox->mbox_sem);*/
+  //Get first item in our mailbox
   struct messageNode* current = mailbox->msg;
   if(NULL != current){
     mailbox->msg = mailbox->msg->next;
@@ -263,12 +269,14 @@ struct messageNode* mailboxDequeue(mbox* mailbox) {
 }
 
 int mbox_create(mbox **mb) {
+  //create mailbox
   *mb = malloc(sizeof(mbox));
   sem_init(&((*mb)->mbox_sem), SEM_LOCK_INIT);
   return 0;
 }
 
 void mbox_destroy(mbox **mb) {
+  //free mailbox
   struct messageNode* current = (*mb)->msg;
   while(NULL != current) {
     free(current->message);
@@ -279,6 +287,7 @@ void mbox_destroy(mbox **mb) {
 }
 
 void mbox_deposit(mbox *mb, char *msg, int len) {
+  //insert a message into our mailbox queue
   struct messageNode* msgNode = malloc(sizeof(struct messageNode));
   msgNode->len = len;
   msgNode->message = (char*) malloc(len*sizeof(char));
@@ -289,6 +298,7 @@ void mbox_deposit(mbox *mb, char *msg, int len) {
 }
 
 void mbox_withdraw(mbox *mb, char *msg, int *len) {
+  //withdrawl the first item from the mailbox and put it in msg
   if (NULL == mb->msg) {
     *len = 0;
   }
@@ -300,6 +310,7 @@ void mbox_withdraw(mbox *mb, char *msg, int *len) {
 }
 
 void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
+  //withdrawl the first item from the mailbox with sender s
   sem_wait(mb->mbox_sem);
   if (NULL == mb->msg) {
     *len = 0;
@@ -347,12 +358,14 @@ void mbox_withdraw_by_sender(mbox *mb, char *msg, int *len, int *sender) {
   }
 }
 
+//put a message into a specified thread mailboxs
 void send(int tid, char *msg, int len) {
   if(tid_map[tid] != NULL){
     mbox_deposit(tid_map[tid], msg, len);
   }
 }
 
+//recieve a message from a thread
 void receive(int *tid, char *msg, int *len) {
   *len = 0;
   if (0 == *tid) {
