@@ -10,3 +10,5 @@ void t_terminate(void);
 typedef void sem_t;
 
 typedef void mbox;
+
+typedef void test;
